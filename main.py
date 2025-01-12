@@ -1,5 +1,5 @@
+from plotnine import ggplot, aes, geom_line, labs, theme_minimal
 import pandas as pd
-from plotnine import ggplot, aes, geom_line, labs
 
 def main():
 
@@ -15,20 +15,26 @@ def main():
     returns_df = returns_df[returns_df['Date'] >= start_date].reset_index(drop=True)
 
     # Calculate cumulative returns
-    returns_df['SPY_cumulative'] = (1 + returns_df['SPY']).cumprod()
-    returns_df['ACWI_cumulative'] = (1 + returns_df['ACWI']).cumprod()
-    
-    # Plot cumulative returns
+    returns_df['SPY cumulative'] = (1 + returns_df['SPY']).cumprod()
+    returns_df['ACWI cumulative'] = (1 + returns_df['ACWI']).cumprod()
+
+    # Melt the DataFrame for plotting
+    returns_melted = returns_df.melt(
+        id_vars=['Date'],
+        value_vars=['SPY cumulative', 'ACWI cumulative'],
+        var_name='Asset',
+        value_name='Cumulative Return'
+    )
+
+    # Plot using color aesthetic for labels
     plot = (
-        ggplot() +
-        geom_line(returns_df, aes(x='Date', y='SPY_cumulative'), color='blue') +
-        geom_line(returns_df, aes(x='Date', y='ACWI_cumulative'), color='red') +
+        ggplot(returns_melted, aes(x='Date', y='Cumulative Return', color='Asset')) +
+        geom_line() +
         labs(title='Cumulative Returns of SPY and ACWI',
              x='Date',
              y='Cumulative Return')
     )
     print(plot)
-
 
 if __name__ == '__main__':
     main()
